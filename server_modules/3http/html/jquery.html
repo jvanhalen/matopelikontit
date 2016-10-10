@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+  <meta charset="UTF-8">
+  <title>Rankinglist</title>
+</head>
+<body>
+  <div id="ranking"></div>
+</body>
+  <script>
+      $.ajax({
+        url: '/',
+        function(data) {
+          document.getElementById("ranking").innerHTML = data;
+        }
+      });
+  </script>
+</html>

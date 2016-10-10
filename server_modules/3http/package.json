@@ -1,0 +1,21 @@
+{
+  "name": "server-feature",
+  "description": "Mostly harmless",
+  "homepage": "",
+  "keywords": [
+    "matopeli",
+    "ranking"
+  ],
+  "author": "Jaakko Vanhala <jaakko.vanhala@karelia.fi>",
+  "contributors": [],
+  "dependencies": {
+    "cors": "^2.8.1",
+    "express": "^4.14.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jvanhalen"
+  },
+  "main": "server.js",
+  "version": "1.0.0"
+}

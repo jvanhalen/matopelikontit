@@ -1,0 +1,21 @@
+{
+  "name": "chat-feature",
+  "description": "Mostly harmless",
+  "homepage": "",
+  "keywords": [
+    "matopeli",
+    "chat"
+  ],
+  "author": "Jaakko Vanhala <jaakko.vanhala@karelia.fi>",
+  "contributors": [],
+  "dependencies": {
+    "express": "^4.14.0",
+    "socket.io": "^1.4.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jvanhalen"
+  },
+  "main": "server.js",
+  "version": "1.0.0"
+}

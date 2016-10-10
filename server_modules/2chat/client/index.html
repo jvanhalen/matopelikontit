@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Websocket test</title>
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script>
+    var socket = io.connect('http://127.0.0.1:3004');
+    socket.on('news', function (data) {
+      socket.emit('my other event', { my: 'data' });
+    });
+  </script>
+</head>
+<body>
+<div id="test"><p>is it working?</p></div>
+</body>
+</html>  

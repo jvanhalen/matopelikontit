@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <link rel="stylesheet" type="text/css" href="uistyle.css">
+  <!--<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>-->
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+  <script>
+    // Connect websocket
+    var socket = io.connect('http://localhost:3004/');
+    socket.on('chatmessage', function (msg) {
+      console.log(msg);
+      handleChatMessage(msg);
+    });
+
+    function login() {
+      // Check user input fields
+      if (document.getElementById("username").value && document.getElementById("password").value) {
+        // TODO: Send login request
+      }
+    }
+
+    function startPolling() {
+      var ival = setInterval(function(){
+        // TODO: Poll for rankings
+        $.get("http://localhost:3002/", function(msg) {
+          console.log(msg);
+          updateRankingList(msg);
+        });/*
+        // TODO: Poll for players
+        $.get("http://172.18.0.3:3000", function(response) {
+          var msg = response;
+          updatePlayerList(msg);
+        })
+        // TODO: Poll for chat messages
+        $.get("http://172.18.0.4:3000", function(response) {
+          var msg = response;
+          handleChatMessage(msg);
+        })*/
+      },2000);
+    }
+
+    function chatKeypress(event) {
+      event.preventDefault;
+      console.log("event.which:", event.which, "event.keyCode:", event.keyCode, "event.charCode:", event.charCode);
+      if (event.which == 13 || event.keyCode == 13) {
+        // Send text if length > 0
+        var chatmsg = document.getElementById('chatmessage').value;
+        if (chatmsg) {
+          // TODO: send message
+          socket.emit('chatmessage', chatmsg);
+          document.getElementById('chatmessage').value = "";
+        }
+      }
+    return true; // NOTE! return false; does not update textbox
+    }
+
+    function handleChatMessage(msg) {
+      console.log("handleChatMessage", msg);
+
+      if (msg.username == "System notice") {
+        document.getElementById('messagebox').innerHTML += '<div id="message">' + msg.username + ':&nbsp;&nbsp;' + msg.text + '</div>';
+      }
+      else {
+        document.getElementById('messagebox').innerHTML += '<div id="message"><a href="#" title="message">'+ msg.username + ':</a>&nbsp;&nbsp;' + msg.text + '</div>';
+      }
+      // Messagebox auto-scroll (quick 'n dirty hack, but should work :)
+      document.getElementById('chatbox').scrollTop += 20;
+    }
+
+    function updatePlayerList(msg) {
+      console.log("updatePlayerList", msg);
+
+      for(var item in msg.players) {
+        console.log("item:", item);
+        var player = msg.players[item];
+        if(player.authenticated === false || player.authenticated == "false") {
+          delete playerList[player.username];
+        }
+        else {
+          playerList[player.username] = player;
+        }
+      }
+
+      console.log("playerList:", playerList);
+
+      document.getElementById('onlineplayerlist').innerHTML = "";
+      for(var player in playerList) {
+        console.log("player:", player)
+        var pre = '<div id="' + player +'">';
+        var text = "";
+        if (playerList[player].ingame === false && playerList[player].username != getUsername()) {
+          text = ' <a href="#" title="challenge" onclick="challenge(\''+playerList[player].username+'\')">'+ playerList[player].username + '</a>';
+        }
+        else {
+          text = player;
+        }
+        post = '</div>';
+        document.getElementById('onlineplayerlist').innerHTML += pre + text + post;
+      }
+
+      sortDivs(document.getElementById('onlineplayerlist'));
+    }
+
+    function updateRankingList(msg) {
+
+      var tmpusers = '<table id="rankings">';
+      for(var item in msg.players) {
+        tmpusers += '<tr>';
+        tmpusers += '<td><strong>' + msg.players[item].username + '</strong></td><td>' + msg.players[item].highscore + '</td>';
+        tmpusers += '</tr>';
+      }
+      tmpusers += '</table>'
+      document.getElementById('rankedplayers').innerHTML = tmpusers;
+      console.log("Ranking list updated");
+    }
+</script>
+</head>
+<body onload="startPolling()">
+  <div class="container">
+    <div id="login">
+      <div id="loginwindow">
+        <fieldset>
+          <legend><strong>Login</strong></legend>
+          <div id="infotext">
+            <p>
+              Player: <input type="text" id="username" size="10" maxlength="10">
+              Password: <input type="password" id="password" size="10" maxlength="20">
+              <input id="login_button" type="submit" value="Login" onclick="login()">
+              <input id="register_button" type="submit" value="Register" onclick="register()">
+            </p>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+    <div id="onlineplayers">
+      <fieldset>
+        <legend><strong>Online players</strong></legend>
+        <div id="onlineplayerlist">
+          <div id="onlineplayer">Wobot</div>
+        </div>
+      </fieldset>
+    </div>
+    <div id="rankinglist">
+      <fieldset>
+        <legend><strong>Player ranking</strong></legend>
+        <div id="rankedplayers">
+          <div id="rankedplayer">Wobot</div>
+        </div>
+      </fieldset>
+    </div>
+    <div id="gameboard">
+      <p>This is a placeholder for the gameboard.</p>
+    </div>
+    <div id="chat">
+      <fieldset>
+        <legend><strong>Messages</strong></legend>
+        <div id="chatbox">
+          <div id="messagebox"></div>
+        </div>
+        <div id="sendmessage">
+          Send: <input type="text" id="chatmessage" size="40" maxlength="140" onkeypress="return chatKeypress(event)">
+        </div>
+      </fieldset>
+    </div>
+    <div id="challengebox">
+      <div id="challenge"></div>
+    </div>
+  </div>
+</body>
+</html>  
